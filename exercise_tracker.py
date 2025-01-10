@@ -25,11 +25,8 @@ class ExerciseTracker:
         # Data storage
         self.exercise_records = []
         
-        # Ensure load_data is valid
-        if hasattr(self, 'load_data') and callable(self.load_data):
-            self.load_data()
-        else:
-            print("Error: 'load_data' method is missing or invalid.")
+        # Load data if the method exists
+        self.load_data()
     
         # Create main container
         self.main_frame = ttk.Frame(root, padding="10")
@@ -38,6 +35,7 @@ class ExerciseTracker:
         # Create frames
         self.create_input_frame()
         self.create_list_frame()
+        self.create_action_buttons()
         
         # Configure grid weights
         root.columnconfigure(0, weight=1)
@@ -191,6 +189,91 @@ class ExerciseTracker:
         # Configure weights
         list_frame.columnconfigure(0, weight=1)
         list_frame.rowconfigure(0, weight=1)
+
+    def create_action_buttons(self):
+        actions_frame = ttk.Frame(self.main_frame, padding="10")
+        actions_frame.grid(row=2, column=0, columnspan=2, pady=10, sticky=(tk.W, tk.E))
+        
+        self.edit_button = ttk.Button(actions_frame, text="Edit Exercise", command=self.edit_exercise)
+        self.edit_button.pack(side=tk.LEFT, padx=5)
+        
+        self.delete_button = ttk.Button(actions_frame, text="Delete Exercise", command=self.delete_exercise)
+        self.delete_button.pack(side=tk.LEFT, padx=5)
+
+    def edit_exercise(self):
+        selected_item = self.tree.selection()
+        if not selected_item:
+            messagebox.showwarning("Warning", "Please select an exercise to edit")
+            return
+            
+        item = selected_item[0]
+        index = self.tree.index(item)
+        
+        # Create edit dialog
+        edit_window = tk.Toplevel(self.root)
+        edit_window.title("Edit Exercise")
+        edit_window.geometry("300x250")
+        
+        # Get current values
+        current_values = self.exercise_records[index]
+        
+        # Create entry fields
+        ttk.Label(edit_window, text="Exercise Name:").grid(row=0, column=0, padx=5, pady=5)
+        name_entry = ttk.Entry(edit_window)
+        name_entry.insert(0, current_values["Exercise Name"])
+        name_entry.grid(row=0, column=1, padx=5, pady=5)
+        
+        ttk.Label(edit_window, text="Amount:").grid(row=1, column=0, padx=5, pady=5)
+        amount_entry = ttk.Entry(edit_window)
+        amount_entry.insert(0, current_values["Amount"])
+        amount_entry.grid(row=1, column=1, padx=5, pady=5)
+        
+        ttk.Label(edit_window, text="Unit:").grid(row=2, column=0, padx=5, pady=5)
+        unit_combobox = ttk.Combobox(edit_window, values=["rounds", "km"])
+        unit_combobox.set(current_values["Unit"])
+        unit_combobox.grid(row=2, column=1, padx=5, pady=5)
+        
+        ttk.Label(edit_window, text="Duration (minutes):").grid(row=3, column=0, padx=5, pady=5)
+        duration_entry = ttk.Entry(edit_window)
+        duration_entry.insert(0, current_values["Duration"])
+        duration_entry.grid(row=3, column=1, padx=5, pady=5)
+        
+        def save_changes():
+            try:
+                new_name = name_entry.get().strip()
+                new_amount = float(amount_entry.get().strip())
+                new_unit = unit_combobox.get().strip()
+                new_duration = float(duration_entry.get().strip())
+                
+                if not new_name:
+                    messagebox.showerror("Error", "Please enter an exercise name")
+                    return
+                    
+                self.exercise_records[index]["Exercise Name"] = new_name
+                self.exercise_records[index]["Amount"] = new_amount
+                self.exercise_records[index]["Unit"] = new_unit
+                self.exercise_records[index]["Duration"] = new_duration
+                self.save_data()
+                self.refresh_list()
+                edit_window.destroy()
+                
+            except ValueError:
+                messagebox.showerror("Error", "Please enter valid numbers for amount and duration")
+        
+        ttk.Button(edit_window, text="Save", command=save_changes).grid(row=4, column=0, columnspan=2, pady=20)
+
+    def delete_exercise(self):
+        selected_item = self.tree.selection()
+        if not selected_item:
+            messagebox.showwarning("Warning", "Please select an exercise to delete")
+            return
+            
+        if messagebox.askyesno("Confirm Delete", "Are you sure you want to delete this exercise?"):
+            item = selected_item[0]
+            index = self.tree.index(item)
+            del self.exercise_records[index]
+            self.save_data()
+            self.refresh_list()
 
     def refresh_list(self):
         for item in self.tree.get_children():
