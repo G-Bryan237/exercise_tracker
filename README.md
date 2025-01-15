@@ -83,14 +83,14 @@ The Exercise Tracker is a Python-based desktop application that helps users log 
 
 ```plaintext
 exercise-tracker/
-├── app.py                 # Main application file
+├── exercise_tracker.py                 # Main application file
 ├── exercise_data.json     # Data file for saved exercise records
 └── README.md              # Documentation (this file)
 ```
 
 ## Screenshots
 
-> Add screenshots of your application here for better visualization.
+![Desktop app exercise tracker](./ex_tr.png)
 
 ## Contributing
 
