@@ -1,4 +1,4 @@
-Here's a **README.md** file tailored for your Exercise Tracker application:
+Exercise Tracker application:
 
 ```markdown
 # Exercise Tracker Application
@@ -105,7 +105,3 @@ Feel free to reach out if you have any questions or suggestions:
 - **Email**: [e.bryandze@gmail.com]
 - **GitHub**: [https://github.com/G-Bryan237]
 ```
-
-### Suggestions:
-- Add relevant screenshots to the **Screenshots** section to improve visual appeal.
-- Replace placeholder URLs and email addresses with your actual details.
